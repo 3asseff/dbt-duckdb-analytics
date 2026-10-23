@@ -1,0 +1,29 @@
+version: 2
+models:
+  - name: stg_customers
+    description: Cleaned customer records.
+    columns:
+      - name: customer_id
+        description: Primary key.
+        tests: [unique, not_null]
+  - name: stg_orders
+    description: Cleaned order records.
+    columns:
+      - name: order_id
+        tests: [unique, not_null]
+      - name: customer_id
+        tests:
+          - relationships:
+              arguments:
+                to: ref('stg_customers')
+                field: customer_id
+      - name: status
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['completed', 'returned', 'cancelled']
+  - name: dim_customers
+    description: One row per customer with completed-order metrics.
+    columns:
+      - name: customer_id
+        tests: [unique, not_null]
