@@ -1,3 +1,8 @@
+{{ config(
+    materialized='incremental',
+    unique_key='order_id'
+) }}
+
 select
     order_id,
     customer_id,
@@ -5,3 +10,7 @@ select
     amount,
     status
 from {{ source('raw', 'orders') }}
+
+{% if is_incremental() %}
+where order_date > (select max(order_date) from {{ this }})
+{% endif %}
